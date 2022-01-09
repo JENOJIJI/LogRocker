@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+  {% block content %}
+<div class="">
+  
+        <h1 class="text-6xl text-bold text-center text-white">Welcome {{username}}</h1>
+        <form id="disconnect" method="POST" action="#">
+            <button class="ml-auto p-4 bg-pink-700 rounded-md shadow hover:bg-red-700 text-white absolute right-6 top-30" type="submit" value="Disconnect Server">Leave</button>
+        </form>
+        
+
+    <script src="//code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+    <script>
+        $(document).ready(function() {
+
+            namespace = '/test';
+            var socket = io(namespace);
+        
+            socket.on('connect', function() {
+                socket.emit('my_event', {data: 'connected to the SocketServer...'});
+            });
+
+            socket.on('my_response', function(msg, cb) {
+               //$('#log').append('<br>' + $('<div/>').text('logs #' + msg.count + ': ' + msg.data).html());
+               document.getElementById('scoreboard').innerText = msg.score
+               console.log(msg.hand)
+               document.getElementById('computerPlay').src=`/static/images/${msg.hand}.png`
+               document.getElementById('computerPlay').className="bg-white mt-20 object-contain h-60 w-96 rounded-md bg-transparent"
+               if (msg.data === 'Disconnected!'){
+                   window.location.replace('http://127.0.0.1:5000/')
+                    alert(msg.data)
+                }else if (msg.data === 'You Win!'){
+                    const username = localStorage.getItem('username')
+                    window.location.replace(`http://127.0.0.1:5000/success/${username}`)
+                }
+                else {
+                    console.log(msg.score)
+                    alert(msg.data)
+                    if (cb)
+                    cb();
+
+                }
+            });
+            $('form#emit1').submit(function(event) {
+                socket.emit('my_event', {data: $('#emit_data1').val()});
+                console.log(document.getElementById('emit_data1').value)
+                return false;
+            });
+            $('form#emit2').submit(function(event) {
+                socket.emit('my_event', {data: $('#emit_data2').val()});
+                console.log(document.getElementById('emit_data2').value)
+                return false;
+            });
+            $('form#emit3').submit(function(event) {
+                socket.emit('my_event', {data: $('#emit_data3').val()});
+                console.log(document.getElementById('emit_data3').value)
+                return false;
+            });
+            $('form#disconnect').submit(function(event) {
+                socket.emit('disconnect_request');
+                return false;
+                
+            });
+        });
+    </script>
+
+        <div class="p-6 rounded-md bg-gray-100 opacity-90 :hover:opacity-20 absolute left-10">
+            <div class="mx-5 px-4">
+                <h2 class="text-xl text-bold uppercase">Score</h2>
+                <div id="log" class="bg-white p-4 border border-black mt-10 text-2xl">
+                    <h1 id="scoreboard" class="text-center">0</h1>
+                </div>
+            </div>
+        </div>
+
+    <div class="flex justify-center">
+        <div class="">
+   
+            <img id="computerPlay">
+        </div>
+    </div>
+</div>
+
+<footer class="absolute bottom-6 w-full">
+    <div class="flex justify-center items-center">
+        <form  id="emit1" action="#" method="POST" class="">
+            <button name="emit_data1" id="emit_data1" value="rock"><img src="/static/images/rock.png" class="object-contain h-40 w-96 cursor-pointer" value="rock"></button>
+        </form>
+        <form  id="emit2" action="#" method="POST" class="">
+            <button name="emit_data2" id="emit_data2" value="paper"><img src="/static/images/paper.png" class="object-contain h-40 w-96 cursor-pointer" value="rock"></button>
+        </form>
+        <form  id="emit3" action="#" method="POST" class="">
+            <button name="emit_data3" id="emit_data3" value="scissors"><img src="/static/images/scissor.png" class="object-contain h-40 w-96 cursor-pointer" value="rock"></button>
+        </form>
+        <!-- <form  id="emit" method="POST" action='#'>
+            <input type="text" name="emit_data" id="emit_data" placeholder="Message">
+            <input type="submit" value="Send Message">
+        </form> -->
+    </div>
+</footer>
+
+{% endblock content %}

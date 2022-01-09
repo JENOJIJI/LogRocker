@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+  {% block content %}
+
+<div class="flex justify-center p-12 my-auto">
+   
+  <form id="user_input" onsubmit="return false" method="POST" class="flex flex-col">
+      <label placeholder="Enter username" class="bg-opacity-20 p-6 text-4xl md:text-6xl text-bold text-white">Username</label>
+      <input type="text" placeholder="Enter username" class="mt-8 p-2 rounded-full drop-shadow-md text-center bg-opacity-40 focus:outline-none focus:bg-opacity-20" name="username" id="username">
+      <button class="shadow-lg mt-12 p-4 bg-gray-100 text-center text-semibold text-xl text-white uppercase rounded-lg bg-opacity-20 hover:bg-opacity-50 hover:text-black" type="submit">submit</button>
+    </form>
+    
+</div>
+
+
+    <script>
+        $("#user_input").submit(function(e) {
+            if (document.getElementById('username').value){
+                const username = document.getElementById('username').value;
+                window.localStorage.setItem("username", username)
+                window.location.replace(`http://127.0.0.1:5000/play/${username}`)
+            }else{
+
+                e.stopImmediatePropagation();
+            }
+        });
+    </script>
+  <script src="/static/script.js"></script>
+  {% endblock content %}
